@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>db-practice-1</title>
+
+    <style>
+        body{
+            background-color: black;
+        }
+        .db-section{
+            display: flex;
+            justify-content: space-around;
+            width: 90%;
+            margin: 0 auto;
+            height: 100vh;
+            color: white;
+        }
+
+        .input-area{
+            display: block;
+            padding: 10px 5px;
+            margin: 10px 0;
+        }
+        .search-area{
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 10px;
+            
+        }
+        .search-area input{
+            padding: 10px 5px;
+            margin: 10px 0;
+        }
+        #search{
+            display: flex;
+            flex-direction: column;
+        }
+    </style>
+</head>
+<body>
+
+    <section class="db-section md:flex ">
+
+        <div id="insert">
+            <input type="text" id="id" placeholder="User ID" class="input-area">
+            <input type="text" id="name" placeholder="Full Name" class="input-area">
+            <input type="text" id="age" placeholder="Age" class="input-area">
+
+            <div>
+                <input type="submit" value="Insert" id="insertbtn">
+                <input type="submit" value="Update" id="updatebtn">
+                <input type="submit" value="Remove" id="removebtn">
+            </div>
+        </div>
+
+        <div id="search">
+            <div class="search-area">
+
+               <div> <input type="text" id="findID" placeholder="User ID"> </div>
+               <div> <input type="submit" value="Search" id="searchBtn">  </div>
+            </div>
+
+            <div id="pID"></div>
+            <div id="pName"></div>
+            <div id="pAge"></div>
+        </div>
+
+    </section>
+
+    <!-- Move your script here -->
+    <script type="module">
+        // Import the functions you need from the SDKs you need
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-app.js";
+        
+
+        const firebaseConfig = {
+         apiKey: "AIzaSyDlyBkksDcaZFB2Z3bbXaxqM7hAM81c3UE",
+        authDomain: "dbpractice1-5c78e.firebaseapp.com",
+        databaseURL: "https://dbpractice1-5c78e-default-rtdb.asia-southeast1.firebasedatabase.app",
+        projectId: "dbpractice1-5c78e",
+        storageBucket: "dbpractice1-5c78e.appspot.com",
+        messagingSenderId: "749986923900",
+        appId: "1:749986923900:web:169de9d95b0d49b90a90f9"
+        };
+
+        const app = initializeApp(firebaseConfig);
+
+        import { getDatabase, set, update, remove, get, ref, child } 
+        from "https://www.gstatic.com/firebasejs/10.13.1/firebase-database.js";
+
+        const db = getDatabase();
+
+        // DOM elements
+        var userId = document.querySelector("#id");
+        var userName = document.querySelector("#name");
+        var userAge = document.querySelector("#age");
+
+        var InsertBtn = document.querySelector("#insertbtn");
+        var UpdateBtn = document.querySelector("#updatebtn");
+        var RemoveBtn = document.querySelector("#removebtn");
+
+        var findID = document.querySelector("#findID");
+        var SearchBtn = document.querySelector("#searchBtn");
+
+        var pID = document.querySelector("#pID");
+        var pName = document.querySelector("#pName");
+        var pAge = document.querySelector("#pAge");
+
+        function insertData() {
+            set(ref(db, 'People/' + userId.value), {
+                ID: userId.value,
+                Name: userName.value,
+                Age: userAge.value
+            })
+            .then(() => {
+                alert("Data Added Successfully");
+
+                userId.value="";
+                userName.value="";
+                userAge.value="";
+            
+            })
+            .catch((error) => {
+                alert(error);
+            });
+
+            
+        };
+
+        function updateData() {
+            // Implementation for updating data
+
+            update(ref(db, "People/" + userId.value),{
+                Name:userName.value,
+                Age:userAge.value
+            })
+
+            .then(()=>{
+                alert("Update Data Succesfully");
+            })
+
+            .catch((error)=>{
+                alert(error);
+            })
+        };
+
+        function removeData() {
+            // Implementation for removing data
+
+            remove(ref(db, "People/" + userId.value))
+            .then(()=>{
+                    alert("Data remove Successfully");
+                })
+            .catch((error)=>{
+                alert(error);
+            })
+        };
+
+        function searchData() {
+            // Implementation for searching data
+
+            const dbref = ref(db);
+
+            get(child(dbref, 'People/' +findID.value))
+        
+
+            .then((snapshot)=>{
+                if(snapshot.exists()){
+                    pName.innerHTML = "Name :" +snapshot.val().Name;
+                    pID.innerHTML = "User ID :"+snapshot.val().ID;
+                    pAge.innerHTML = "Age :"+snapshot.val().Age;
+                }
+
+                else{
+                    pName.innerHTML = "Your ID Not Found";
+                }
+                
+            })
+
+            .catch((error)=>{
+                pName.innerHTML = error;
+            });
+
+           
+        
+        };
+
+        InsertBtn.addEventListener('click', insertData);
+        UpdateBtn.addEventListener('click', updateData);
+        RemoveBtn.addEventListener('click', removeData);
+        SearchBtn.addEventListener('click', searchData);
+
+    </script>
+</body>
+</html>
